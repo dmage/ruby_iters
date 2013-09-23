@@ -105,3 +105,32 @@ def replace_by_program_output(iter, command)
 	iter.connect(x, 0)
 	return x
 end
+
+class ToFloatIterator < UnaryIterator
+	def evaluate(inputs)
+		result = nil
+		if !inputs[0].nil?
+			result = inputs[0].to_f
+		end
+		return result 
+	end
+end
+
+def to_float(iter)
+	x = ToFloatIterator.new
+	iter.connect(x, 0)
+	return x
+end
+
+class SubtractIterator < BinaryIterator
+	def evaluate(inputs)
+		return inputs[0] - inputs[1]
+	end
+end
+
+def subtract(iter0, iter1)
+	x = SubtractIterator.new
+	iter0.connect(x, 0)
+	iter1.connect(x, 1)
+	return x
+end

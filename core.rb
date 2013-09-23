@@ -12,11 +12,19 @@ class Iterator
 		@connections << [iter, i]
 	end
 
-	def send(i, value)
+	def enqueue(i, value)
 		# puts("received #{value} by #{self} (#{i})")
-
 		@input_queue[i] << value
+	end
 
+	def send(i, value)
+		enqueue(i, value)
+
+		while handle_input_queue
+		end
+	end
+
+	def handle_input_queue
 		ready = true
 		@input_queue.each do |queue|
 			if queue.size == 0
@@ -30,19 +38,25 @@ class Iterator
 				inputs << queue.shift
 			end
 
+			skip = false
 			inputs.each do |x|
 				if x.nil?
-					# puts("rejecting inputs #{inputs}")
-					return
+					skip = true
 				end
 			end
-			result = evaluate(inputs)
+			if !skip
+				result = evaluate(inputs)
+			else
+				result = nil
+			end
 
 			@connections.each do |connetion|
 				iter, i = connetion
 				iter.send(i, result)
 			end
 		end
+
+		return ready
 	end
 
 	def evaluate(inputs)
@@ -73,6 +87,13 @@ class Source < UnaryIterator
 	def self.all_sources
 		return @@all_sources
 	end
+end
+
+def prev(iter)
+	x = UnaryIterator.new
+	x.enqueue(0, nil)
+	iter.connect(x, 0)
+	return x
 end
 
 def run
