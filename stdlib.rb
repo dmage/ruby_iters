@@ -8,9 +8,25 @@ class TextFile < Source
 	end
 
 	def run
-		if select([@f], [], [], 1)
+		if select([@f], [], [], 0.1)
 			line = @f.gets
 			self.send(0, line)
+		end
+	end
+end
+
+class Timer < Source
+	def initialize(minimal_delay)
+		super()
+		@minimal_delay = minimal_delay
+		@last_fire = nil
+	end
+
+	def run
+		now = Time.now.to_f
+		if @last_fire.nil? || (now - @last_fire >= @minimal_delay)
+			@last_fire = now
+			self.send(0, now)
 		end
 	end
 end
@@ -21,6 +37,12 @@ class DisplayIterator < UnaryIterator
 		puts("#{value}")
 		return value
 	end
+end
+
+def display(iter)
+	x = DisplayIterator.new()
+	iter.connect(x, 0)
+	return x
 end
 
 class ExtractIterator < UnaryIterator
@@ -39,10 +61,26 @@ class ExtractIterator < UnaryIterator
 	end
 end
 
-def display(iter)
-	x = DisplayIterator.new()
+def extract(iter, regexp)
+	x = ExtractIterator.new(regexp)
 	iter.connect(x, 0)
 	return x
+end
+
+class ExtractIterator < UnaryIterator
+	def initialize(regexp)
+		super()
+		@regexp = regexp
+	end
+
+	def evaluate(inputs)
+		value = inputs[0]
+		match = @regexp.match(value)
+		if !match.nil?
+			return match[1]
+		end
+		return nil
+	end
 end
 
 def extract(iter, regexp)
@@ -51,10 +89,19 @@ def extract(iter, regexp)
 	return x
 end
 
-def run
-	while true
-		Source.all_sources.each do |x|
-			x.run()
-		end
+class ReplaceByProgramOutputIterator < UnaryIterator
+	def initialize(command)
+		super()
+		@command = command
 	end
+
+	def evaluate(inputs)
+		return `#{@command}`
+	end
+end
+
+def replace_by_program_output(iter, command)
+	x = ReplaceByProgramOutputIterator.new(command)
+	iter.connect(x, 0)
+	return x
 end

@@ -74,3 +74,11 @@ class Source < UnaryIterator
 		return @@all_sources
 	end
 end
+
+def run
+	while true
+		Source.all_sources.each do |x|
+			x.run()
+		end
+	end
+end
