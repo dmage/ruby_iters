@@ -73,7 +73,7 @@ class Print2Iterator < Iterator
 
 	def evaluate(inputs)
 		value1 = inputs[0]
-		value2 = inputs[0]
+		value2 = inputs[1]
 		result = @pattern.sub(/\$1/, value1.to_s).sub(/\$2/, value2.to_s)
 		puts(result)
 		return result
