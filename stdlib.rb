@@ -45,6 +45,48 @@ def display(iter)
 	return x
 end
 
+class Print1Iterator < Iterator
+	def initialize(pattern)
+		super(1)
+		@pattern = pattern
+	end
+
+	def evaluate(inputs)
+		value1 = inputs[0]
+		result = @pattern.sub(/\$1/, value1.to_s)
+		puts(result)
+		return result
+	end
+end
+
+def print1(pattern, iter)
+	x = Print1Iterator.new(pattern)
+	iter.connect(x, 0)
+	return x
+end
+
+class Print2Iterator < Iterator
+	def initialize(pattern)
+		super(2)
+		@pattern = pattern
+	end
+
+	def evaluate(inputs)
+		value1 = inputs[0]
+		value2 = inputs[0]
+		result = @pattern.sub(/\$1/, value1.to_s).sub(/\$2/, value2.to_s)
+		puts(result)
+		return result
+	end
+end
+
+def print2(pattern, iter0, iter1)
+	x = Print2Iterator.new(pattern)
+	iter0.connect(x, 0)
+	iter1.connect(x, 1)
+	return x
+end
+
 class ExtractIterator < UnaryIterator
 	def initialize(regexp)
 		super()
