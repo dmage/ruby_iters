@@ -45,45 +45,24 @@ def display(iter)
 	return x
 end
 
-class Print1Iterator < Iterator
-	def initialize(pattern)
-		super(1)
+class PrintIterator < Iterator
+	def initialize(pattern, n_ary)
+		super(n_ary)
 		@pattern = pattern
 	end
 
 	def evaluate(inputs)
-		value1 = inputs[0]
-		result = @pattern.sub(/\$1/, value1.to_s)
+		result = sprintf(@pattern, *inputs)
 		puts(result)
 		return result
 	end
 end
 
-def print1(pattern, iter)
-	x = Print1Iterator.new(pattern)
-	iter.connect(x, 0)
-	return x
-end
-
-class Print2Iterator < Iterator
-	def initialize(pattern)
-		super(2)
-		@pattern = pattern
+def print(pattern, *iters)
+	x = PrintIterator.new(pattern, iters.size)
+	(0..iters.size - 1).each do |i|
+		iters[i].connect(x, i)
 	end
-
-	def evaluate(inputs)
-		value1 = inputs[0]
-		value2 = inputs[1]
-		result = @pattern.sub(/\$1/, value1.to_s).sub(/\$2/, value2.to_s)
-		puts(result)
-		return result
-	end
-end
-
-def print2(pattern, iter0, iter1)
-	x = Print2Iterator.new(pattern)
-	iter0.connect(x, 0)
-	iter1.connect(x, 1)
 	return x
 end
 
